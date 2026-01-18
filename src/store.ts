@@ -63,6 +63,19 @@ export function homedir(): string {
   return HOME;
 }
 
+/**
+ * Expand ~ to home directory in paths
+ */
+export function expandPath(path: string): string {
+  if (path.startsWith('~/')) {
+    return HOME + path.slice(1);
+  }
+  if (path === '~') {
+    return HOME;
+  }
+  return path;
+}
+
 export function resolve(...paths: string[]): string {
   if (paths.length === 0) {
     throw new Error("resolve: at least one path segment is required");
@@ -1355,7 +1368,7 @@ export function getCollectionByName(db: Database, name: string): { name: string;
 
   return {
     name: collection.name,
-    pwd: collection.path,
+    pwd: expandPath(collection.path),
     glob_pattern: collection.pattern,
   };
 }
@@ -1380,7 +1393,7 @@ export function listCollections(db: Database): { name: string; pwd: string; glob
 
     return {
       name: coll.name,
-      pwd: coll.path,
+      pwd: expandPath(coll.path),
       glob_pattern: coll.pattern,
       doc_count: stats?.doc_count || 0,
       active_count: stats?.active_count || 0,
